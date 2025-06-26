@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Scroll-Based 3D Interaction</title>
+  <style>
+    body, html {
+      margin: 0;
+      height: 200vh; /* Makes the page scrollable */
+      overflow-x: hidden;
+    }
+    canvas {
+      display: block;
+      position: fixed;
+      top: 0;
+      left: 0;
+    }
+  </style>
+</head>
+<body>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.155.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.155.0/examples/js/loaders/GLTFLoader.js"></script>
+  <script>
+    // Setup
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // Light
+    const light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(0, 1, 1).normalize();
+    scene.add(light);
+
+    // Load 3D model
+    let model;
+    const loader = new THREE.GLTFLoader();
+    loader.load('model.gltf', function (gltf) {
+      model = gltf.scene;
+      model.scale.set(1, 1, 1);
+      scene.add(model);
+      animate();
+    });
+
+    camera.position.z = 5;
+
+    // Animate and scroll interaction
+    function animate() {
+      requestAnimationFrame(animate);
+
+      if (model) {
+        const scrollY = window.scrollY;
+        model.rotation.y = scrollY * 0.002; // rotate based on scroll
+        model.position.y = -scrollY * 0.01; // move model down as scroll
+      }
+
+      renderer.render(scene, camera);
+    }
+
+    // Responsive canvas
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>

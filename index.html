@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<title>W3.CSS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
+    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.10.14/build/spline-viewer.js"></script>
+    <spline-viewer url="https://prod.spline.design/qfBJYWqYCNweOgAz/scene.splinecode"></spline-viewer>
+<style>
+
+	  #wrapper{
+    	/* background-color:red; */
+    	height:150px;
+        width :150px;
+        position:absolute;
+         top: 0;
+        left: 0;
+        transition: ease-in-out 1s ;
+          transform: rotate(45deg);
+    }
+    
+    body{
+    	position:relative;
+    }
+</style>
+
+
+
+<body>
+  <div id="wrapper">
+        
+    	<img src="coco.png" style="height: 300px;" alt="Coco Image" />
+
+        
+    	<!-- <img src="ball.png" style="height: 300px;" alt="Coco Image" /> -->
+    </div>
+<!-- <div class="w3-container">
+	
+  
+
+  <h2>Cards</h2>
+  <p></p>
+
+  <div class="w3-panel w3-card"><p>-card</p></div>
+  <div class="w3-panel w3-card-2"><p>-card-2</p></div>
+  <div class="w3-panel w3-card-4"><p>-card-4</p></div>
+    <div class="w3-panel w3-card"><p>-card</p></div>
+  <div class="w3-panel w3-card-2"><p>-card-2</p></div>
+  <div class="w3-panel w3-card-4"><p>-card-4</p></div>
+    <div class="w3-panel w3-card"><p>-card</p></div>
+  <div class="w3-panel w3-card-2"><p>-card-2</p></div>
+  <div class="w3-panel w3-card-4"><p>-card-4</p></div>  <div class="w3-panel w3-card"><p>w3-card</p></div>
+  <div class="w3-panel w3-card-2"><p>-card-2</p></div>
+  <div class="w3-panel w3-card-4"><p>-card-4</p></div>
+    <div class="w3-panel w3-card"><p>-card</p></div>
+  <div class="w3-panel w3-card-2"><p>-card-2</p></div>
+  <div class="w3-panel w3-card-4"><p>-card-4</p></div>  <div class="w3-panel w3-card"><p>w3-card</p></div>
+  <div class="w3-panel w3-card-2"><p>-card-2</p></div>
+  <div class="w3-panel w3-card-4"><p>-card-4</p></div>  <div class="w3-panel w3-card"><p>w3-card</p></div>
+  <div class="w3-panel w3-card-2"><p>-card-2</p></div>
+  <div class="w3-panel w3-card-4"><p>-card-4</p></div>  <div class="w3-panel w3-card"><p>w3-card</p></div>
+  <div class="w3-panel w3-card-2"><p>-card-2</p></div>
+  <div class="w3-panel w3-card-4"><p>-card-4</p></div>
+    <div class="w3-panel w3-card"><p>-card</p></div>
+  <div class="w3-panel w3-card-2"><p>-card-2</p></div>
+  <div class="w3-panel w3-card-4"><p>-card-4</p></div>
+    <div class="w3-panel w3-card"><p>-card</p></div>
+  <div class="w3-panel w3-card-2"><p>-card-2</p></div>
+  <div class="w3-panel w3-card-4"><p>-card-4</p></div>
+</div> -->
+<script>
+
+//   window.addEventListener('wheel', function(event) {
+//   event.preventDefault(); // prevent default scrolling
+
+//   // Adjust scroll step by multiplying deltaY by a fraction to reduce jump
+//   const scrollStep = event.deltaY * 0.1; // 0.3 reduces scroll speed to 30%
+  
+//   window.scrollBy(0, scrollStep);
+// }, { passive: false });
+
+  let wrapper=document.getElementById("wrapper");
+  window.addEventListener("scroll", function () {
+    const scrollY = window.scrollY;
+    console.log(window.scrollY)
+    // Y position moves with scroll
+    const y = scrollY;
+
+    // X position moves in a zigzag pattern using sine wave
+    // adjust values to control frequency/amplitude
+    const x = Math.sin(scrollY / 50) * 100; 
+    // Apply positions
+    wrapper.style.top = y+y + "px";
+    wrapper.style.left = 850 + x + "px"; // offset so it doesn't start at 0
+
+    wrapper.style.transform =`rotate(${y/4}deg)`;
+  });
+</script>
+</body>
+</html>
