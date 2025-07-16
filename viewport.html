@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sections with Scroll Labels</title>
+<style>
+  html, body {
+    margin: 0; padding: 0; height: 100%; width: 100%;
+    font-family: Arial, sans-serif;
+  }
+  .section {
+    height: 100vh;
+    width: 100vw;
+  }
+  .section1 { background-color: #1abc9c; }
+  .section2 { background-color: #3498db; }
+  .section3 { background-color: #9b59b6; }
+  .section4 { background-color: #e67e22; }
+  .section5 { background-color: #e74c3c; }
+
+  /* Fixed labels container */
+  #labels {
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.6);
+    color: white;
+    padding: 8px 15px;
+    border-radius: 8px;
+    font-size: 16px;
+    z-index: 1000;
+    user-select: none;
+    font-weight: bold;
+    width: max-content;
+  }
+  #labels > div {
+    margin: 4px 0;
+  }
+</style>
+</head>
+<body>
+
+<div id="labels">
+  <div>Top Reach: <span id="topReachLabel">None</span></div>
+  <div>In View: <span id="inViewLabel">None</span></div>
+</div>
+
+<section class="section section1" id="section1"></section>
+<section class="section section2" id="section2"></section>
+<section class="section section3" id="section3"></section>
+<section class="section section4" id="section4"></section>
+<section class="section section5" id="section5"></section>
+
+<script>
+  const sections = document.querySelectorAll('.section');
+  const topReachLabel = document.getElementById('topReachLabel');
+  const inViewLabel = document.getElementById('inViewLabel');
+
+  // Function to check which section is at top of viewport
+  function getTopReachSection() {
+    let topSection = null;
+    let minDistance = window.innerHeight;
+
+    sections.forEach(section => {
+      const rect = section.getBoundingClientRect();
+      const distanceFromTop = Math.abs(rect.top);
+      if (distanceFromTop < minDistance && rect.top <= window.innerHeight) {
+        minDistance = distanceFromTop;
+        topSection = section;
+      }
+    });
+    return topSection;
+  }
+
+  // Function to check which sections are visible in viewport (even partially)
+  function getVisibleSections() {
+    const visibleSections = [];
+    sections.forEach(section => {
+      const rect = section.getBoundingClientRect();
+      // Check if section is at least partially visible vertically and horizontally (width always full)
+      if (rect.bottom > 0 && rect.top < window.innerHeight) {
+        visibleSections.push(section);
+      }
+    });
+    return visibleSections;
+  }
+
+  function updateLabels() {
+    const topSection = getTopReachSection();
+    topReachLabel.textContent = topSection ? topSection.id : 'None';
+
+    const visibleSections = getVisibleSections();
+    if (visibleSections.length === 0) {
+      inViewLabel.textContent = 'None';
+    } else if (visibleSections.length === 1) {
+      inViewLabel.textContent = visibleSections[0].id;
+    } else {
+      // Multiple visible sections: show comma separated ids
+      inViewLabel.textContent = visibleSections.map(s => s.id).join(', ');
+    }
+  }
+
+  window.addEventListener('scroll', updateLabels);
+  window.addEventListener('resize', updateLabels);
+
+  // Initial call on page load
+  updateLabels();
+</script>
+
+</body>
+</html>

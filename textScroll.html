@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sections with Scroll-Based Text Wheel</title>
+<style>
+  html, body {
+    margin: 0; padding: 0; height: 100%; width: 100%;
+    font-family: Arial, sans-serif;
+    background-color: #111; /* Added a dark background for better contrast */
+    color: white;
+  }
+  .section {
+    height: 100vh;
+    width: 100vw;
+    position: relative; /* Needed for child positioning */
+  }
+  .section1 { background-color: #1abc9c; }
+  /* Make section2 taller to provide a scroll area for the animation */
+  .section2 {
+    background-image: radial-gradient(
+      circle at center, #2c3e50, #1d2833 80%
+    );
+    height: 250vh;
+  }
+  .section3 { background-color: #9b59b6; }
+  .section4 { background-color: #e67e22; }
+  .section5 { background-color: #e74c3c; }
+
+  /* Fixed labels container for debugging scroll */
+  #labels {
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.6);
+    color: white;
+    padding: 8px 15px;
+    border-radius: 8px;
+    font-size: 16px;
+    z-index: 1000;
+    user-select: none;
+    font-weight: bold;
+    width: max-content;
+  }
+  #labels > div {
+    margin: 4px 0;
+  }
+  
+  /* --- STYLES FOR THE TEXT WHEEL ANIMATION --- */
+
+  /* The sticky container that holds our animation canvas */
+  #textScroll{
+    position: sticky;
+    top: 0;
+    width: 100%;
+    height: 100vh; /* Make it take up the full screen */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; /* Crucial: hide text that rotates out of view */
+  }
+  
+  /* The main element that we will rotate on scroll */
+  #wheel-container {
+    position: relative;
+    width: 90vmin;  /* Use viewport units for responsiveness */
+    height: 90vmin;
+    transform-origin: center center;
+    font-weight: 500;
+    text-transform: uppercase;
+    /* transition for smoother stopping */
+    transition: transform 0.2s ease-out;
+  }
+
+  /* Container for each of the three main text groups */
+  .text-block {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform-origin: center center;
+    /* JS will set the transform to position these in a circle */
+  }
+
+  /* Each line of curved text within a text-block */
+  .curved-text {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    font-size: 2.5vmin; /* Responsive font size */
+  }
+  
+  /* Each individual character */
+  .char {
+    position: absolute;
+    left: 50%;
+    /* transform-origin will be set by JS to create the arc */
+  }
+
+</style>
+</head>
+<body>
+
+<div id="labels">
+  <div>Top Reach: <span id="topReachLabel">None</span></div>
+  <div>In View: <span id="inViewLabel">None</span></div>
+  <div>Scroll Progress (in section2): <span id="progressLabel">0</span>%</div>
+</div>
+
+<section class="section section1" id="section1"></section>
+
+<section class="section section2" id="section2">
+    <!-- This is the sticky container for our animation -->
+    <div id="textScroll">
+        <!-- This is the element that will rotate -->
+        <div id="wheel-container">
+            <!-- The three text blocks will be dynamically generated here by JavaScript -->
+        </div>
+    </div>
+</section>
+
+<section class="section section3" id="section3"></section>
+<section class="section section4" id="section4"></section>
+<section class="section section5" id="section5"></section>
+
+<script>
+  // This script is for the debug labels at the top
+  const sections = document.querySelectorAll('.section');
+  const topReachLabel = document.getElementById('topReachLabel');
+  const inViewLabel = document.getElementById('inViewLabel');
+  const progressLabel = document.getElementById('progressLabel');
+
+  function getTopReachSection() {
+    let topSection = null;
+    let minDistance = window.innerHeight;
+
+    sections.forEach(section => {
+      const rect = section.getBoundingClientRect();
+      const distanceFromTop = Math.abs(rect.top);
+      if (distanceFromTop < minDistance && rect.top <= window.innerHeight) {
+        minDistance = distanceFromTop;
+        topSection = section;
+      }
+    });
+    return topSection;
+  }
+
+  function getVisibleSections() {
+    const visibleSections = [];
+    sections.forEach(section => {
+      const rect = section.getBoundingClientRect();
+      if (rect.bottom > 0 && rect.top < window.innerHeight) {
+        visibleSections.push(section);
+      }
+    });
+    return visibleSections;
+  }
+
+  function updateLabels() {
+    const topSection = getTopReachSection();
+    topReachLabel.textContent = topSection ? topSection.id : 'None';
+
+    const visibleSections = getVisibleSections();
+    inViewLabel.textContent = visibleSections.length > 0 ? visibleSections.map(s => s.id).join(', ') : 'None';
+  }
+
+  window.addEventListener('scroll', updateLabels);
+  window.addEventListener('resize', updateLabels);
+  updateLabels();
+</script>
+
+
+<script>
+    // --- SCRIPT FOR THE TEXT WHEEL ANIMATION ---
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        const wheelContainer = document.getElementById('wheel-container');
+        const section2 = document.getElementById('section2');
+
+        // Configuration for our three text blocks
+        const wheelConfig = [
+            {
+                angle: 0,
+                lines: [
+                    { text: "Our production is", radius: 10, charAngle: 4.5 },
+                    { text: "environmentally friendly", radius: 14, charAngle: 3.5 }
+                ]
+            },
+            {
+                angle: 120,
+                lines: [
+                    { text: "Every cup is made from", radius: 10, charAngle: 3.5 },
+                    { text: "high-quality ingredients", radius: 14, charAngle: 3 }
+                ]
+            },
+            {
+                angle: 240,
+                lines: [
+                    { text: "A delight for", radius: 10, charAngle: 6 },
+                    { text: "everyone", radius: 14, charAngle: 8 }
+                ]
+            }
+        ];
+
+        /**
+         * Creates a line of curved text and appends it to a parent element.
+         * @param {string} text - The text to display.
+         * @param {number} radius - The radius of the curve in 'em' units.
+         * @param {number} charAngle - The degrees of separation between each character.
+         * @returns {HTMLElement} - The created DOM element for the curved text line.
+         */
+        function createCurvedText(text, radius, charAngle) {
+            const container = document.createElement('div');
+            container.className = 'curved-text';
+
+            const totalAngle = (text.length - 1) * charAngle;
+            const startAngle = -totalAngle / 2;
+
+            text.split('').forEach((char, index) => {
+                const charSpan = document.createElement('span');
+                charSpan.className = 'char';
+                charSpan.innerText = char === ' ' ? '\u00A0' : char; // Use non-breaking space
+                
+                const rotation = startAngle + index * charAngle;
+                
+                charSpan.style.transform = `rotate(${rotation}deg)`;
+                // The 'transform-origin' is the key to creating the arc effect.
+                charSpan.style.transformOrigin = `center ${radius}em`;
+                
+                container.appendChild(charSpan);
+            });
+            return container;
+        }
+
+        /**
+         * Sets up the entire wheel by creating and positioning all text blocks.
+         */
+        function setupWheel() {
+            // The distance to push each text block out from the center
+            const blockOffset = '22vmin'; 
+
+            wheelConfig.forEach(blockData => {
+                const textBlock = document.createElement('div');
+                textBlock.className = 'text-block';
+                
+                // Position each block in a circle (0, 120, 240 degrees)
+                // We use rotate() to set the angle, then translateY() to push it outwards.
+                // A second rotate() straightens the text block itself.
+                textBlock.style.transform = `rotate(${blockData.angle}deg) translateY(-${blockOffset}) rotate(-${blockData.angle}deg)`;
+
+                blockData.lines.forEach(line => {
+                    const curvedLine = createCurvedText(line.text, line.radius, line.charAngle);
+                    textBlock.appendChild(curvedLine);
+                });
+
+                wheelContainer.appendChild(textBlock);
+            });
+        }
+
+        /**
+         * Handles the scroll event to animate the wheel.
+         */
+        function handleScroll() {
+            const rect = section2.getBoundingClientRect();
+
+            // We only want to animate when section2 is in the viewport
+            if (rect.bottom < 0 || rect.top > window.innerHeight) {
+                return;
+            }
+
+            // Calculate how far we've scrolled through section2.
+            // The total scrollable distance for the animation is the section's height minus one viewport height.
+            const scrollableDist = section2.clientHeight - window.innerHeight;
+            const progress = -rect.top / scrollableDist;
+
+            // Clamp progress between 0 and 1
+            const clampedProgress = Math.max(0, Math.min(1, progress));
+            
+            // Update the debug label
+            progressLabel.textContent = (clampedProgress * 100).toFixed(1);
+
+            // Animate the wheel's rotation based on scroll progress.
+            // We rotate by -120 degrees to bring the second item to the top.
+            // You can change this value for a faster or slower rotation.
+            const totalRotation = -120;
+            const currentRotation = clampedProgress * totalRotation;
+
+            wheelContainer.style.transform = `rotate(${currentRotation}deg)`;
+        }
+
+        // Initialize and add event listener
+        setupWheel();
+        window.addEventListener('scroll', handleScroll, { passive: true });
+    });
+</script>
+
+</body>
+</html>
