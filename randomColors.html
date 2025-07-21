@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Grid Randomizer</title>
+
+    <!-- CSS is embedded directly in the HTML using the <style> tag -->
+    <style>
+        /* General Body & Layout Styling */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 1rem;
+            box-sizing: border-box;
+        }
+
+        main {
+            text-align: center;
+            background-color: #ffffff;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 800px;
+        }
+
+        h1 {
+            color: #1c1e21;
+        }
+
+        /* Button Styling */
+        #reorderBtn {
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-bottom: 1.5rem;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+
+        #reorderBtn:hover {
+            background-color: #0056b3;
+        }
+
+        #reorderBtn:active {
+            transform: scale(0.98);
+        }
+
+        /* Grid Styling */
+        #grid-container {
+            display: grid;
+            /* We want 180 cells. An 18x10 grid is a good layout. */
+            grid-template-columns: repeat(18, 1fr);
+            gap: 5px; /* Space between cells */
+            margin: 0 auto;
+        }
+
+        .grid-cell {
+            /* This makes each cell a perfect square */
+            aspect-ratio: 1 / 1;
+            border-radius: 4px;
+            /* Smooth transition for color changes */
+            transition: background-color 0.4s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HTML structure for the page content -->
+    <main>
+        <h1>180-Cell Color Grid</h1>
+        <p>Click the button to randomly reorder the color pattern across the grid.</p>
+        <button id="reorderBtn">Reorder Colors</button>
+        <div id="grid-container"></div>
+    </main>
+
+    <!-- JavaScript is embedded directly using the <script> tag -->
+    <script>
+        // Wait for the HTML content to be fully loaded before running the script
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- CONFIGURATION ---
+            const gridContainer = document.getElementById('grid-container');
+            const reorderBtn = document.getElementById('reorderBtn');
+            const totalCells = 180;
+            const baseColors = [
+                '#FF0000', // Red
+                '#FFA500', // Orange
+                '#FFFF00', // Yellow
+                '#008000', // Green
+                '#0000FF', // Blue
+                '#4B0082', // Indigo
+                '#EE82EE'  // Violet
+            ];
+
+            // --- FUNCTIONS ---
+
+            /**
+             * Creates the initial grid of 180 empty cells.
+             * This runs only once to avoid re-creating DOM elements unnecessarily.
+             */
+            function initializeGrid() {
+                // Clear any existing content
+                gridContainer.innerHTML = ''; 
+                for (let i = 0; i < totalCells; i++) {
+                    const cell = document.createElement('div');
+                    cell.classList.add('grid-cell');
+                    gridContainer.appendChild(cell);
+                }
+            }
+
+            /**
+             * Shuffles an array in place using the Fisher-Yates algorithm.
+             * @param {Array} array The array to be shuffled.
+             * @returns {Array} The shuffled array.
+             */
+            function shuffleArray(array) {
+                // Create a copy to avoid modifying the original array
+                const shuffled = [...array]; 
+                for (let i = shuffled.length - 1; i > 0; i--) {
+                    // Pick a random index from 0 to i
+                    const j = Math.floor(Math.random() * (i + 1));
+                    // Swap elements
+                    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+                }
+                return shuffled;
+            }
+
+            /**
+             * Updates the colors of the grid cells based on a new random pattern.
+             */
+            function updateGridColors() {
+                const currentPattern = shuffleArray(baseColors);
+                const cells = gridContainer.querySelectorAll('.grid-cell');
+
+                cells.forEach((cell, index) => {
+                    // Use the modulo operator to cycle through the 7 colors
+                    const colorIndex = index % currentPattern.length;
+                    cell.style.backgroundColor = currentPattern[colorIndex];
+                });
+            }
+
+            // --- INITIALIZATION ---
+
+            // 1. Create the grid structure
+            initializeGrid();
+            
+            // 2. Populate it with the first random color pattern
+            updateGridColors();
+
+            // 3. Add event listener to the button to reorder colors on click
+            reorderBtn.addEventListener('click', updateGridColors);
+
+        });
+    </script>
+
+</body>
+</html>
