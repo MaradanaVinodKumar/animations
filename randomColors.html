@@ -2,17 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- This meta tag is CRUCIAL for responsive design on all devices -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Responsive Color Grid</title>
+    <title>Advanced Color Grid</title>
 
     <style>
-        /* A common reset for better cross-browser consistency */
         *, *::before, *::after {
             box-sizing: border-box;
         }
 
-        /* General Body & Layout Styling */
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: #f0f2f5;
@@ -22,7 +19,6 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            /* Add some padding for small screens */
             padding: 1rem;
         }
 
@@ -62,56 +58,52 @@
             transform: scale(0.98);
         }
 
-        /* --- RESPONSIVE GRID STYLING (THE KEY CHANGE IS HERE) --- */
+        /* Responsive Grid Styling */
         #grid-container {
             display: grid;
-            /* 
-              This is the magic for responsiveness.
-              - auto-fit: Create as many columns as will fit.
-              - minmax(40px, 1fr): Each column must be at least 40px wide, 
-                but can grow to 1 fraction of the available space (1fr).
-              This automatically adjusts the number of columns based on screen width.
-            */
             grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
-            gap: 5px; /* Space between cells */
+            gap: 5px;
             margin: 0 auto;
         }
 
         .grid-cell {
-            /* This makes each cell a perfect square */
             aspect-ratio: 1 / 1;
             border-radius: 4px;
-            /* Smooth transition for color changes */
             transition: background-color 0.4s ease-in-out;
+            /* The cursor indicates the cell is interactive on hover */
+            cursor: help;
         }
     </style>
 </head>
 <body>
 
-    <!-- HTML structure (unchanged) -->
     <main>
-        <h1>Responsive 180-Cell Color Grid</h1>
-        <p>Click the button to randomly reorder the color pattern. Resize your browser to see the grid adapt!</p>
+        <h1>Advanced 180-Cell Color Grid</h1>
+        <p>Hover over a cell to see its color name. Click the button for a new random set of colors!</p>
         <button id="reorderBtn">Reorder Colors</button>
         <div id="grid-container"></div>
     </main>
 
-    <!-- JavaScript (unchanged) -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const gridContainer = document.getElementById('grid-container');
             const reorderBtn = document.getElementById('reorderBtn');
             const totalCells = 180;
+            
+            // The color data is now an array of objects to store both name and hex code
             const baseColors = [
-                '#FF0000', // Red
-                '#FFA500', // Orange
-                '#FFFF00', // Yellow
-                '#008000', // Green
-                '#0000FF', // Blue
-                '#4B0082', // Indigo
-                '#EE82EE'  // Violet
+                { name: 'Red',    hex: '#FF0000' },
+                { name: 'Orange', hex: '#FFA500' },
+                { name: 'Yellow', hex: '#FFFF00' },
+                { name: 'Green',  hex: '#008000' },
+                { name: 'Blue',   hex: '#0000FF' },
+                { name: 'Indigo', hex: '#4B0082' },
+                { name: 'Violet', hex: '#EE82EE' }
             ];
 
+            /**
+             * Creates the initial grid of 180 empty cells. Runs only once.
+             */
             function initializeGrid() {
                 gridContainer.innerHTML = ''; 
                 for (let i = 0; i < totalCells; i++) {
@@ -121,27 +113,34 @@
                 }
             }
 
-            function shuffleArray(array) {
-                const shuffled = [...array]; 
-                for (let i = shuffled.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-                }
-                return shuffled;
-            }
-
+            /**
+             * Updates the grid. For each cell, it picks a random color from the base colors
+             * and sets both its background color and its hover title.
+             */
             function updateGridColors() {
-                const currentPattern = shuffleArray(baseColors);
                 const cells = gridContainer.querySelectorAll('.grid-cell');
 
-                cells.forEach((cell, index) => {
-                    const colorIndex = index % currentPattern.length;
-                    cell.style.backgroundColor = currentPattern[colorIndex];
+                cells.forEach(cell => {
+                    // 1. Pick a random color object from the baseColors array
+                    const randomColor = baseColors[Math.floor(Math.random() * baseColors.length)];
+
+                    // 2. Set the background color of the cell using the 'hex' property
+                    cell.style.backgroundColor = randomColor.hex;
+                    
+                    // 3. Set the 'title' attribute for the hover tooltip using the 'name' property
+                    cell.title = randomColor.name;
                 });
             }
 
+            // --- INITIALIZATION ---
+            
+            // 1. Create the grid structure
             initializeGrid();
+            
+            // 2. Populate it with the first set of fully random colors
             updateGridColors();
+
+            // 3. Add event listener to the button to re-randomize colors on click
             reorderBtn.addEventListener('click', updateGridColors);
         });
     </script>
