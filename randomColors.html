@@ -29,7 +29,7 @@
             border-radius: 10px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 900px;
+            /* max-width: 900px; */
         }
 
         h1 {
@@ -61,7 +61,7 @@
         /* Responsive Grid Styling */
         #grid-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(3.5vw, 1fr));
             gap: 5px;
             margin: 0 auto;
         }
@@ -78,10 +78,11 @@
 <body>
 
     <main>
-        <h1>Advanced 180-Cell Color Grid</h1>
-        <p>Hover over a cell to see its color name. Click the button for a new random set of colors!</p>
-        <button id="reorderBtn">Reorder Colors</button>
-        <div id="grid-container"></div>
+         <div id="grid-container"></div>
+        <h1>Ramkrishna's World Record Color Memory Grid</h1>
+        <p>This page is dedicated to Ramkrishna's incredible world record in color memorization. Hover over each of the 180 cells to reveal the color names. Click the button below to generate a new challenge and continue training!</p>
+        <button id="reorderBtn">Generate New Color Challenge</button>
+       
     </main>
 
     <script>
@@ -120,13 +121,14 @@
             function updateGridColors() {
                 const cells = gridContainer.querySelectorAll('.grid-cell');
 
-                cells.forEach(cell => {
+                cells.forEach((cell,i) => {
                     // 1. Pick a random color object from the baseColors array
                     const randomColor = baseColors[Math.floor(Math.random() * baseColors.length)];
 
                     // 2. Set the background color of the cell using the 'hex' property
                     cell.style.backgroundColor = randomColor.hex;
-                    
+                    // cell.innerText = i+1;
+
                     // 3. Set the 'title' attribute for the hover tooltip using the 'name' property
                     cell.title = randomColor.name;
                 });
